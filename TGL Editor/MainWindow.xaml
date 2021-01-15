@@ -8,9 +8,26 @@
         Title="TGL Editor" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="41*"/>
-            <ColumnDefinition Width="759*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Header="ID" Width="1*"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="2*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.EditingElementStyle>
+                        <Style TargetType="TextBox">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="AcceptsReturn" Value="true" />
+                        </Style>
+                    </DataGridTextColumn.EditingElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding SFX, UpdateSourceTrigger=PropertyChanged}" Header="SFX" Width="1*"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

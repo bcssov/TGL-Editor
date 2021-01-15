@@ -11,9 +11,14 @@
 // </copyright>
 // <summary></summary>
 // ***********************************************************************
+
+using Microsoft.Win32;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -23,11 +28,28 @@ namespace TGL_Editor
     /// Interaction logic for MainWindow.xaml
     /// Implements the <see cref="System.Windows.Window" />
     /// Implements the <see cref="System.Windows.Markup.IComponentConnector" />
+    /// Implements the <see cref="System.ComponentModel.INotifyPropertyChanged" />
     /// </summary>
+    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="System.Windows.Window" />
     /// <seealso cref="System.Windows.Markup.IComponentConnector" />
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
+
     {
+        #region Fields
+
+        /// <summary>
+        /// The TGL
+        /// </summary>
+        private readonly TGL tgl = new TGL();
+
+        /// <summary>
+        /// The TGL data
+        /// </summary>
+        private ObservableCollection<TGLData> tglData = new ObservableCollection<TGLData>();
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -36,10 +58,41 @@ namespace TGL_Editor
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             RegisterGlobalBinding(new KeyGesture(Key.O, ModifierKeys.Control), LoadFile);
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the TGL data.
+        /// </summary>
+        /// <value>The TGL data.</value>
+        public ObservableCollection<TGLData> TGLData
+        {
+            get
+            {
+                return tglData;
+            }
+            set
+            {
+                tglData = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TGLData)));
+            }
+        }
+
+        #endregion Properties
 
         #region Methods
 
@@ -48,6 +101,21 @@ namespace TGL_Editor
         /// </summary>
         private void LoadFile()
         {
+            var dialog = new OpenFileDialog()
+            {
+                Filter = "TGL|*.tgl",
+                Multiselect = false,
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                Title = "Select TGL to load"
+            };
+            if (dialog.ShowDialog().GetValueOrDefault())
+            {
+                var fileName = dialog.FileName;
+                using var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                fs.Seek(0, SeekOrigin.Begin);
+                using var br = new BinaryReader(fs);
+                TGLData = new ObservableCollection<TGLData>(tgl.Parse(br.ReadBytes((int)fs.Length)));
+            }
         }
 
         /// <summary>
