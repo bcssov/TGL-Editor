@@ -10,7 +10,14 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0" TextChanged="TextBox_TextChanged"></TextBox>
+        <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" 
+                  CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" 
+                  EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Header="ID" Width="1*"></DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="2*">

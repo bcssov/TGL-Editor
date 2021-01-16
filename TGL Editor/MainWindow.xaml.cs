@@ -4,7 +4,7 @@
 // Created          : 01-15-2021
 //
 // Last Modified By : Mario
-// Last Modified On : 01-15-2021
+// Last Modified On : 01-16-2021
 // ***********************************************************************
 // <copyright file="MainWindow.xaml.cs" company="TGL Editor">
 //     Copyright (c) Mario. All rights reserved.
@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace TGL_Editor
@@ -42,6 +43,11 @@ namespace TGL_Editor
         /// The TGL
         /// </summary>
         private readonly TGL tgl = new TGL();
+
+        /// <summary>
+        /// The full TGL data
+        /// </summary>
+        private IEnumerable<TGLData> fullTGLData = null;
 
         /// <summary>
         /// The TGL data
@@ -114,7 +120,8 @@ namespace TGL_Editor
                 using var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 fs.Seek(0, SeekOrigin.Begin);
                 using var br = new BinaryReader(fs);
-                TGLData = new ObservableCollection<TGLData>(tgl.Parse(br.ReadBytes((int)fs.Length)));
+                fullTGLData = tgl.Parse(br.ReadBytes((int)fs.Length));
+                TGLData = new ObservableCollection<TGLData>(fullTGLData);
             }
         }
 
@@ -131,6 +138,26 @@ namespace TGL_Editor
             var commandBinding = new CommandBinding(cmd);
             commandBinding.Executed += (sender, args) => action.Invoke();
             CommandBindings.Add(commandBinding);
+        }
+
+        /// <summary>
+        /// Texts the box text changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="System.Windows.Controls.TextChangedEventArgs"/> instance containing the event data.</param>
+        private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            var text = ((TextBox)sender).Text;
+            IEnumerable<TGLData> filtered;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                filtered = fullTGLData;
+            }
+            else
+            {
+                filtered = fullTGLData.Where(p => p.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || p.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || p.SFX.Contains(text, StringComparison.OrdinalIgnoreCase));
+            }
+            TGLData = new ObservableCollection<TGLData>(filtered);
         }
 
         #endregion Methods
