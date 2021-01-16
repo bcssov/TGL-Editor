@@ -1,0 +1,24 @@
+﻿<Window x:Class="TGL_Editor.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TGL_Editor"
+        mc:Ignorable="d"
+        Title="Dialog" Height="200" Width="500" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Viewbox Grid.Row="0">
+            <TextBlock Name="message" FontSize="20" TextWrapping="Wrap"/>
+        </Viewbox>
+        <Viewbox Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Yes" Margin="1" Width="60" Click="Ok_Click" IsDefault="True" />
+                <Button Content="No" Margin="1" Width="60" IsCancel="True" Click="Cancel_Click" />
+            </StackPanel>
+        </Viewbox>
+    </Grid>
+</Window>

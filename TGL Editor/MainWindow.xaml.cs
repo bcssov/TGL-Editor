@@ -26,12 +26,10 @@ using System.Windows.Input;
 namespace TGL_Editor
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Class MainWindow.
     /// Implements the <see cref="System.Windows.Window" />
     /// Implements the <see cref="System.Windows.Markup.IComponentConnector" />
-    /// Implements the <see cref="System.ComponentModel.INotifyPropertyChanged" />
     /// </summary>
-    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="System.Windows.Window" />
     /// <seealso cref="System.Windows.Markup.IComponentConnector" />
     public partial class MainWindow : Window
@@ -79,6 +77,7 @@ namespace TGL_Editor
             InitializeGrid();
             RegisterGlobalBinding(new KeyGesture(Key.O, ModifierKeys.Control), LoadFile);
             RegisterGlobalBinding(new KeyGesture(Key.S, ModifierKeys.Control), SaveFile);
+            RegisterGlobalBinding(new KeyGesture(Key.N, ModifierKeys.Control), NewFile);
         }
 
         #endregion Constructors
@@ -143,6 +142,24 @@ namespace TGL_Editor
                 using var br = new BinaryReader(fs);
                 var data = tgl.Parse(br.ReadBytes((int)fs.Length));
                 tglData = new ObservableCollection<TGLData>(data ?? new List<TGLData>());
+                InitializeGrid();
+            }
+        }
+
+        /// <summary>
+        /// Creates new file.
+        /// </summary>
+        private void NewFile()
+        {
+            var init = true;
+            if (tglData.Count > 0)
+            {
+                var dialog = new Dialog(this, "Confirm", "Grid could have unsaved changes, do you want to proceed?");
+                init = dialog.ShowDialog().GetValueOrDefault();
+            }
+            if (init)
+            {
+                tglData = new ObservableCollection<TGLData>(new List<TGLData>());
                 InitializeGrid();
             }
         }
