@@ -17,7 +17,8 @@
         <TextBox Grid.Row="0" TextChanged="TextBox_TextChanged"></TextBox>
         <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" 
                   CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" 
-                  EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1">
+                  EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}" 
+                  Grid.Row="1" LoadingRow="DataGrid_LoadingRow" Name="dataGrid">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Header="ID" Width="1*"></DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="2*">

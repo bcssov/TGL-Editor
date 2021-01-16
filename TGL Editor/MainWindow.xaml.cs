@@ -103,6 +103,23 @@ namespace TGL_Editor
         #region Methods
 
         /// <summary>
+        /// Handles the LoadingRow event of the DataGrid control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataGridRowEventArgs" /> instance containing the event data.</param>
+        private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            if (e.Row.GetIndex() < TGLData.Count)
+            {
+                e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+            }
+            else
+            {
+                e.Row.Header = string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Loads the file.
         /// </summary>
         private void LoadFile()
@@ -144,7 +161,7 @@ namespace TGL_Editor
         /// Texts the box text changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.Windows.Controls.TextChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.Controls.TextChangedEventArgs" /> instance containing the event data.</param>
         private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             var text = ((TextBox)sender).Text;
@@ -158,6 +175,7 @@ namespace TGL_Editor
                 filtered = fullTGLData.Where(p => p.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || p.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || p.SFX.Contains(text, StringComparison.OrdinalIgnoreCase));
             }
             TGLData = new ObservableCollection<TGLData>(filtered);
+            dataGrid.Items.Refresh();
         }
 
         #endregion Methods
