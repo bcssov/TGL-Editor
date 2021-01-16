@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TGL_Editor"
         mc:Ignorable="d"
-        Title="TGL Editor" Height="450" Width="800">
+        Title="TGL Editor" Height="600" Width="1000">
+    <Window.Resources>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -14,14 +19,26 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBox Grid.Row="0" TextChanged="TextBox_TextChanged"></TextBox>
+        <TextBox Grid.Row="0" TextChanged="TextBox_TextChanged" Name="filter"></TextBox>
+        <TextBlock Grid.Row="0" IsHitTestVisible="False" Text="Enter text to filter or clear to reset filter..." Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=filter}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
         <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" 
                   CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" 
                   EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}" 
                   Grid.Row="1" LoadingRow="DataGrid_LoadingRow" Name="dataGrid">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Header="ID" Width="1*"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="2*">
+                <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="4*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap" />
@@ -34,7 +51,7 @@
                         </Style>
                     </DataGridTextColumn.EditingElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding SFX, UpdateSourceTrigger=PropertyChanged}" Header="SFX" Width="1*"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding SFX, UpdateSourceTrigger=PropertyChanged}" Header="SFX" Width="2*"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

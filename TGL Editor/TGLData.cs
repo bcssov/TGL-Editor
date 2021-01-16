@@ -4,7 +4,7 @@
 // Created          : 01-15-2021
 //
 // Last Modified By : Mario
-// Last Modified On : 01-15-2021
+// Last Modified On : 01-16-2021
 // ***********************************************************************
 // <copyright file="TGLData.cs" company="TGL Editor">
 //     Copyright (c) Mario. All rights reserved.
@@ -29,17 +29,17 @@ namespace TGL_Editor
         /// <summary>
         /// The data
         /// </summary>
-        private string data;
+        private string data = string.Empty;
 
         /// <summary>
         /// The identifier
         /// </summary>
-        private string id;
+        private string id = string.Empty;
 
         /// <summary>
         /// The SFX
         /// </summary>
-        private string sfx;
+        private string sfx = string.Empty;
 
         #endregion Fields
 
@@ -66,7 +66,7 @@ namespace TGL_Editor
             }
             set
             {
-                data = value;
+                data = value ?? string.Empty;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Data)));
             }
         }
@@ -83,7 +83,7 @@ namespace TGL_Editor
             }
             set
             {
-                id = value;
+                id = value ?? string.Empty;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Id)));
             }
         }
@@ -100,7 +100,7 @@ namespace TGL_Editor
             }
             set
             {
-                sfx = value;
+                sfx = value ?? string.Empty;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SFX)));
             }
         }

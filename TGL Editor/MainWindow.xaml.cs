@@ -64,6 +64,7 @@ namespace TGL_Editor
         public MainWindow()
         {
             InitializeComponent();
+            Style = (Style)FindResource(typeof(Window));
             DataContext = this;
             RegisterGlobalBinding(new KeyGesture(Key.O, ModifierKeys.Control), LoadFile);
         }
@@ -139,6 +140,7 @@ namespace TGL_Editor
                 using var br = new BinaryReader(fs);
                 fullTGLData = tgl.Parse(br.ReadBytes((int)fs.Length));
                 TGLData = new ObservableCollection<TGLData>(fullTGLData);
+                filter.Text = string.Empty;
             }
         }
 
@@ -172,9 +174,16 @@ namespace TGL_Editor
             }
             else
             {
-                filtered = fullTGLData.Where(p => p.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || p.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || p.SFX.Contains(text, StringComparison.OrdinalIgnoreCase));
+                if (fullTGLData != null)
+                {
+                    filtered = fullTGLData.Where(p => p.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || p.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || p.SFX.Contains(text, StringComparison.OrdinalIgnoreCase));
+                }
+                else
+                {
+                    filtered = fullTGLData;
+                }
             }
-            TGLData = new ObservableCollection<TGLData>(filtered);
+            TGLData = new ObservableCollection<TGLData>(filtered ?? new List<TGLData>());
             dataGrid.Items.Refresh();
         }
 
