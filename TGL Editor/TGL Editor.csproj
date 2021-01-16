@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>TGL_Editor</RootNamespace>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>TGLIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

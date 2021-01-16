@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:TGL_Editor.TGL.GetInt(System.Byte[])~System.Int32")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:TGL_Editor.TGL.ReadString(System.Collections.Generic.IEnumerable{System.Byte},System.Int32,System.Int32)~System.String")]
+[assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:TGL_Editor.TGL.GetBytes(System.Int32)~System.Byte[]")]

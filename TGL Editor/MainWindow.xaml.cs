@@ -16,11 +16,11 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace TGL_Editor
@@ -34,7 +34,7 @@ namespace TGL_Editor
     /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     /// <seealso cref="System.Windows.Window" />
     /// <seealso cref="System.Windows.Markup.IComponentConnector" />
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
 
     {
         #region Fields
@@ -45,14 +45,24 @@ namespace TGL_Editor
         private readonly TGL tgl = new TGL();
 
         /// <summary>
-        /// The full TGL data
+        /// The file name
         /// </summary>
-        private IEnumerable<TGLData> fullTGLData = null;
+        private string fileName = string.Empty;
 
         /// <summary>
         /// The TGL data
         /// </summary>
         private ObservableCollection<TGLData> tglData = new ObservableCollection<TGLData>();
+
+        /// <summary>
+        /// The TGL view source
+        /// </summary>
+        private CollectionViewSource tglViewSource;
+
+        /// <summary>
+        /// The visible items
+        /// </summary>
+        private int visibleItems = 0;
 
         #endregion Fields
 
@@ -66,42 +76,24 @@ namespace TGL_Editor
             InitializeComponent();
             Style = (Style)FindResource(typeof(Window));
             DataContext = this;
+            InitializeGrid();
             RegisterGlobalBinding(new KeyGesture(Key.O, ModifierKeys.Control), LoadFile);
+            RegisterGlobalBinding(new KeyGesture(Key.S, ModifierKeys.Control), SaveFile);
         }
 
         #endregion Constructors
 
-        #region Events
-
-        /// <summary>
-        /// Occurs when a property value changes.
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the TGL data.
-        /// </summary>
-        /// <value>The TGL data.</value>
-        public ObservableCollection<TGLData> TGLData
-        {
-            get
-            {
-                return tglData;
-            }
-            set
-            {
-                tglData = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TGLData)));
-            }
-        }
-
-        #endregion Properties
-
         #region Methods
+
+        /// <summary>
+        /// Handles the AddingNewItem event of the dataGrid control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="AddingNewItemEventArgs" /> instance containing the event data.</param>
+        private void dataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
+        {
+            filter.Text = string.Empty;
+        }
 
         /// <summary>
         /// Handles the LoadingRow event of the DataGrid control.
@@ -110,7 +102,7 @@ namespace TGL_Editor
         /// <param name="e">The <see cref="DataGridRowEventArgs" /> instance containing the event data.</param>
         private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
         {
-            if (e.Row.GetIndex() < TGLData.Count)
+            if (e.Row.GetIndex() < visibleItems)
             {
                 e.Row.Header = (e.Row.GetIndex() + 1).ToString();
             }
@@ -118,6 +110,18 @@ namespace TGL_Editor
             {
                 e.Row.Header = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Initializes the grid.
+        /// </summary>
+        private void InitializeGrid()
+        {
+            tglViewSource = new CollectionViewSource() { Source = tglData };
+            tglViewSource.View.Filter = null;
+            visibleItems = tglData.Count;
+            dataGrid.ItemsSource = tglViewSource.View;
+            filter.Text = string.Empty;
         }
 
         /// <summary>
@@ -129,18 +133,17 @@ namespace TGL_Editor
             {
                 Filter = "TGL|*.tgl",
                 Multiselect = false,
-                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
                 Title = "Select TGL to load"
             };
             if (dialog.ShowDialog().GetValueOrDefault())
             {
-                var fileName = dialog.FileName;
+                fileName = dialog.FileName;
                 using var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 fs.Seek(0, SeekOrigin.Begin);
                 using var br = new BinaryReader(fs);
-                fullTGLData = tgl.Parse(br.ReadBytes((int)fs.Length));
-                TGLData = new ObservableCollection<TGLData>(fullTGLData);
-                filter.Text = string.Empty;
+                var data = tgl.Parse(br.ReadBytes((int)fs.Length));
+                tglData = new ObservableCollection<TGLData>(data ?? new List<TGLData>());
+                InitializeGrid();
             }
         }
 
@@ -160,6 +163,25 @@ namespace TGL_Editor
         }
 
         /// <summary>
+        /// Saves the file.
+        /// </summary>
+        private void SaveFile()
+        {
+            var dialog = new SaveFileDialog()
+            {
+                Filter = "TGL|*.tgl",
+                Title = "Save TGL file",
+                FileName = fileName
+            };
+            if (dialog.ShowDialog().GetValueOrDefault())
+            {
+                fileName = dialog.FileName;
+                using var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Write);
+                tgl.Save(fs, tglData);
+            }
+        }
+
+        /// <summary>
         /// Texts the box text changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -167,24 +189,20 @@ namespace TGL_Editor
         private void TextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             var text = ((TextBox)sender).Text;
-            IEnumerable<TGLData> filtered;
             if (string.IsNullOrWhiteSpace(text))
             {
-                filtered = fullTGLData;
+                tglViewSource.View.Filter = null;
+                visibleItems = tglData.Count;
             }
             else
             {
-                if (fullTGLData != null)
+                tglViewSource.View.Filter = new Predicate<object>(p =>
                 {
-                    filtered = fullTGLData.Where(p => p.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || p.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || p.SFX.Contains(text, StringComparison.OrdinalIgnoreCase));
-                }
-                else
-                {
-                    filtered = fullTGLData;
-                }
+                    var model = (TGLData)p;
+                    return model.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || model.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || model.SFX.Contains(text, StringComparison.OrdinalIgnoreCase);
+                });
+                visibleItems = tglViewSource.View.Cast<object>().Count() - 1;
             }
-            TGLData = new ObservableCollection<TGLData>(filtered ?? new List<TGLData>());
-            dataGrid.Items.Refresh();
         }
 
         #endregion Methods

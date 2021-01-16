@@ -34,8 +34,7 @@
         </TextBlock>
         <DataGrid AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True" 
                   CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" 
-                  EnableRowVirtualization="True" ItemsSource="{Binding TGLData, UpdateSourceTrigger=PropertyChanged}" 
-                  Grid.Row="1" LoadingRow="DataGrid_LoadingRow" Name="dataGrid">
+                  EnableRowVirtualization="True" Grid.Row="1" LoadingRow="DataGrid_LoadingRow" Name="dataGrid" AddingNewItem="dataGrid_AddingNewItem">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Header="ID" Width="1*"></DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Data, UpdateSourceTrigger=PropertyChanged}" Header="Data" Width="4*">

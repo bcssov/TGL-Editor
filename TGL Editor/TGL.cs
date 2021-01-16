@@ -4,7 +4,7 @@
 // Created          : 01-15-2021
 //
 // Last Modified By : Mario
-// Last Modified On : 01-15-2021
+// Last Modified On : 01-16-2021
 // ***********************************************************************
 // <copyright file="TGL.cs" company="TGL Editor">
 //     Copyright (c) Mario. All rights reserved.
@@ -12,7 +12,9 @@
 // <summary></summary>
 // ***********************************************************************
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -40,6 +42,17 @@ namespace TGL_Editor
         /// </summary>
         private const char NullChar = '\0';
 
+        /// <summary>
+        /// The TGL byte headers
+        /// </summary>
+        private static readonly byte[] tglHeaders = new byte[] { 1, 23, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 }; // 1701 :)
+
+        // Don't know what exactly these represent and in all tgls I've tried they were empty... probably padding but I recall that there was something else to it?
+        /// <summary>
+        /// The TGL byte information
+        /// </summary>
+        private static readonly byte[] tglInfo = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
         #endregion Fields
 
         #region Constructors
@@ -54,6 +67,18 @@ namespace TGL_Editor
         #endregion Constructors
 
         #region Methods
+
+        /// <summary>
+        /// Gets the bytes.
+        /// </summary>
+        /// <param name="number">The number.</param>
+        /// <returns>System.Byte[].</returns>
+        public byte[] GetBytes(int number)
+        {
+            var result = new byte[4];
+            BinaryPrimitives.WriteInt32LittleEndian(result, number);
+            return result;
+        }
 
         /// <summary>
         /// Parses the specified bytes.
@@ -131,8 +156,56 @@ namespace TGL_Editor
         /// <summary>
         /// Saves this instance.
         /// </summary>
-        public void Save()
+        /// <param name="stream">The stream.</param>
+        /// <param name="data">The data.</param>
+        public void Save(Stream stream, IReadOnlyCollection<TGLData> data)
         {
+            var bytes = new List<byte>();
+            void writeSequence(IReadOnlyCollection<string> col, int? number, bool separeteWithNull = false)
+            {
+                foreach (var item in col)
+                {
+                    var text = item;
+                    if (separeteWithNull)
+                    {
+                        text = string.Join(NullChar, item.ToCharArray()) + NullChar + NullChar;
+                    }
+                    text += NullChar;
+                    bytes.AddRange(Encoding.UTF8.GetBytes(text));
+                }
+                if (number.HasValue)
+                {
+                    bytes.AddRange(GetBytes(number.GetValueOrDefault()));
+                }
+            }
+
+            // Write static header
+            bytes.AddRange(tglHeaders);
+            // Write total count
+            bytes.AddRange(GetBytes(data.Count));
+            // Write what seemingly seems empty bytes
+            bytes.AddRange(tglInfo);
+            // Now need to write length information summed up
+            int idLen = 0, dataLen = 0, sfxLen = 0;
+            var last = data.Last();
+            foreach (var item in data)
+            {
+                idLen += item.Id.Length + 1;
+                dataLen += item.Data.Length + 1;
+                sfxLen += item.SFX.Length + 1;
+                bytes.AddRange(GetBytes(idLen));
+                if (item != last)
+                {
+                    // These are written as separators after id columns
+                    bytes.AddRange(GetBytes(dataLen));
+                    bytes.AddRange(GetBytes(sfxLen));
+                }
+            }
+            writeSequence(data.Select(p => p.Id).ToList(), dataLen, false);
+            writeSequence(data.Select(p => p.Data).ToList(), sfxLen, true);
+            writeSequence(data.Select(p => p.SFX).ToList(), null, false);
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Write(bytes.ToArray(), 0, bytes.Count);
         }
 
         /// <summary>
@@ -142,11 +215,7 @@ namespace TGL_Editor
         /// <returns>System.Int32.</returns>
         private int GetInt(byte[] bytes)
         {
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes.ToArray());
-            }
-            return BitConverter.ToInt32(bytes, 0);
+            return BinaryPrimitives.ReadInt32LittleEndian(bytes);
         }
 
         /// <summary>
