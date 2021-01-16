@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Mario</Authors>
+    <Company>Mario</Company>
+    <Product>TGL Editor</Product>
+    <Copyright>Mario</Copyright>    
+    <RepositoryType>GIT</RepositoryType>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+  <PropertyGroup Label="BasePath">
+    <SolutionDir Condition="'$(SolutionDir)'==''">$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>  
+</Project>

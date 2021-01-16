@@ -149,12 +149,12 @@ namespace TGL_Editor
         public void Save(Stream stream, IReadOnlyCollection<TGLData> data)
         {
             var bytes = new List<byte>();
-            void writeSequence(IReadOnlyCollection<string> col, int? number, bool separeteWithNull = false)
+            void writeSequence(IReadOnlyCollection<string> col, int? number, bool separateWithNull = false)
             {
                 foreach (var item in col)
                 {
                     var text = item;
-                    if (separeteWithNull)
+                    if (separateWithNull)
                     {
                         text = string.Join(NullChar, item.ToCharArray()) + NullChar + NullChar;
                     }
