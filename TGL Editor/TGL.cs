@@ -69,18 +69,6 @@ namespace TGL_Editor
         #region Methods
 
         /// <summary>
-        /// Gets the bytes.
-        /// </summary>
-        /// <param name="number">The number.</param>
-        /// <returns>System.Byte[].</returns>
-        public byte[] GetBytes(int number)
-        {
-            var result = new byte[4];
-            BinaryPrimitives.WriteInt32LittleEndian(result, number);
-            return result;
-        }
-
-        /// <summary>
         /// Parses the specified bytes.
         /// </summary>
         /// <param name="bytes">The bytes.</param>
@@ -206,6 +194,18 @@ namespace TGL_Editor
             writeSequence(data.Select(p => p.SFX).ToList(), null, false);
             stream.Seek(0, SeekOrigin.Begin);
             stream.Write(bytes.ToArray(), 0, bytes.Count);
+        }
+
+        /// <summary>
+        /// Gets the bytes.
+        /// </summary>
+        /// <param name="number">The number.</param>
+        /// <returns>System.Byte[].</returns>
+        private byte[] GetBytes(int number)
+        {
+            var result = new byte[4];
+            BinaryPrimitives.WriteInt32LittleEndian(result, number);
+            return result;
         }
 
         /// <summary>
