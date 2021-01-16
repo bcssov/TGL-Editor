@@ -8,7 +8,7 @@
         Title="TGL Editor" Height="600" Width="1000">
     <Window.Resources>
         <Style TargetType="{x:Type Window}">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
         </Style>
     </Window.Resources>
     <Grid>
@@ -20,7 +20,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBox Grid.Row="0" TextChanged="TextBox_TextChanged" Name="filter"></TextBox>
-        <TextBlock Grid.Row="0" IsHitTestVisible="False" Text="Enter text to filter or clear to reset filter..." Foreground="DarkGray">
+        <TextBlock Grid.Row="0" IsHitTestVisible="False" Text="Enter text to filter or clear to reset filter. Advanced filtering is possible by using {column}:{term} ex.'id:searchTerm'." Foreground="Gray">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}">
                     <Setter Property="Visibility" Value="Collapsed"/>

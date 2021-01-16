@@ -213,10 +213,38 @@ namespace TGL_Editor
             }
             else
             {
+                string filter = string.Empty;
+                string term = text;
+                var split = text.Split(":");
+                if (split.Count() == 2)
+                {
+                    filter = split[0];
+                    term = split[1];
+                }
                 tglViewSource.View.Filter = new Predicate<object>(p =>
                 {
                     var model = (TGLData)p;
-                    return model.Id.Contains(text, StringComparison.OrdinalIgnoreCase) || model.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || model.SFX.Contains(text, StringComparison.OrdinalIgnoreCase);
+                    if (string.IsNullOrWhiteSpace(filter))
+                    {
+                        return model.Id.Contains(term, StringComparison.OrdinalIgnoreCase) || model.Data.Contains(term, StringComparison.OrdinalIgnoreCase) || model.SFX.Contains(term, StringComparison.OrdinalIgnoreCase);
+                    }
+                    else
+                    {
+                        switch (filter.ToLowerInvariant())
+                        {
+                            case "id":
+                                return model.Id.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+                            case "data":
+                                return model.Data.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+                            case "sfx":
+                                return model.SFX.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+                            default:
+                                return model.Id.Contains(term, StringComparison.OrdinalIgnoreCase) || model.Data.Contains(text, StringComparison.OrdinalIgnoreCase) || model.SFX.Contains(text, StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
                 });
                 visibleItems = tglViewSource.View.Cast<object>().Count() - 1;
             }
