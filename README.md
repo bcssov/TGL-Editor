@@ -10,4 +10,4 @@ Enter a search term to filter by all columns. To fine grain filters use the foll
 * data:searchTerm
 
 ### Grid editing
-Double click on a cell to edit data. Use DEELETE keyboard key to delete item(s) from the grid.
+Double click on a cell to edit data. Use DELETE keyboard key to delete item(s) from the grid.
