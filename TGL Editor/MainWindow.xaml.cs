@@ -4,7 +4,7 @@
 // Created          : 01-15-2021
 //
 // Last Modified By : Mario
-// Last Modified On : 01-16-2021
+// Last Modified On : 01-19-2021
 // ***********************************************************************
 // <copyright file="MainWindow.xaml.cs" company="TGL Editor">
 //     Copyright (c) Mario. All rights reserved.
@@ -92,6 +92,8 @@ namespace TGL_Editor
         private void dataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
             filter.Text = string.Empty;
+            visibleItems++;
+            dataGrid.Items.Refresh();
         }
 
         /// <summary>
