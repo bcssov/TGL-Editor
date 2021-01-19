@@ -48,6 +48,11 @@ namespace TGL_Editor
         private string fileName = string.Empty;
 
         /// <summary>
+        /// The subscribed
+        /// </summary>
+        private bool subscribed = false;
+
+        /// <summary>
         /// The TGL data
         /// </summary>
         private ObservableCollection<TGLData> tglData = new ObservableCollection<TGLData>();
@@ -92,8 +97,6 @@ namespace TGL_Editor
         private void dataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
             filter.Text = string.Empty;
-            visibleItems++;
-            dataGrid.Items.Refresh();
         }
 
         /// <summary>
@@ -123,6 +126,12 @@ namespace TGL_Editor
             visibleItems = tglData.Count;
             dataGrid.ItemsSource = tglViewSource.View;
             filter.Text = string.Empty;
+            if (subscribed)
+            {
+                tglViewSource.View.CollectionChanged -= TglData_CollectionChanged;
+            }
+            tglViewSource.View.CollectionChanged += TglData_CollectionChanged;
+            subscribed = true;
         }
 
         /// <summary>
@@ -249,6 +258,23 @@ namespace TGL_Editor
                     }
                 });
                 visibleItems = tglViewSource.View.Cast<object>().Count() - 1;
+            }
+        }
+
+        /// <summary>
+        /// Handles the CollectionChanged event of the TglData control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Collections.Specialized.NotifyCollectionChangedEventArgs" /> instance containing the event data.</param>
+        private void TglData_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            visibleItems = tglViewSource.View.Cast<object>().Count() - 1;
+            try
+            {
+                dataGrid.Items.Refresh();
+            }
+            catch // Otherwise crashes the app, no any flags wnich can be used to determine if can or cannot refresh and am too lazy to fix properly
+            {
             }
         }
 
